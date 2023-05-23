@@ -1,7 +1,7 @@
 # Waves of Boredom
 
 This is my collection of scripts I have made to help find a cure from my boredom.
-
+![](https://www.google.com/url?sa=i&url=https%3A%2F%2Fgiphy.com%2Fexplore%2Fwaves-sticker&psig=AOvVaw2KqfB_7KjoOngHup2km3ol&ust=1684935853729000&source=images&cd=vfe&ved=0CA0QjRxqFwoTCLCrgrjJi_8CFQAAAAAdAAAAABAE)
 
 ## Project selection
 
