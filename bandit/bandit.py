@@ -2,6 +2,7 @@ from  paramiko import SSHClient, AutoAddPolicy
 import time
 import re
 import base64
+
 server = "bandit.labs.overthewire.org" # Hostname
 port_bandit = "2220"  # port
 counter = 0
@@ -16,10 +17,11 @@ for counter in range(0, 34):
     client = SSHClient()
     client.set_missing_host_key_policy(AutoAddPolicy())
     client.connect(server, username=username_bandit, password=Key, port=port_bandit)
+
     Key=""
-    time.sleep(4)
+
     ssh_stdin, ssh_stdout, ssh_stderr = client.exec_command(cmd)
-    Key= ssh_stdout.readlines()
+    stdout= ssh_stdout.readlines()
 
     time.sleep(2)
     client.close()
@@ -29,8 +31,9 @@ for counter in range(0, 34):
     if Key!="":
         print("Password for {} : {}".format(username_bandit, Key))
 
+    time.sleep(3)
     Key = Key.strip()
-    counter +=1
+    counter += 1
     ################################################################ Level 1 
     username_bandit = "bandit{}".format(counter) # Username
     cmd= "cat ./-"  #command
@@ -359,7 +362,7 @@ for counter in range(0, 34):
     if text:
         Key = text.group(0)
 
-    print("Password for {} : {}".format(username_bandit, Key))
+    print("Password for {} : {}\n".format(username_bandit, Key))
 
     Key = Key.strip()
     counter += 1
@@ -379,6 +382,180 @@ for counter in range(0, 34):
     time.sleep(2)
     client.close()
 
-    print("Password for {} : {}".format(username_bandit, Key))
+    print("Password for {} : {}\n".format(username_bandit, Key))
 
     Key = Key.strip()
+    counter += 1
+    ################################################################ Level 14
+    username_bandit = "bandit{}".format(counter) # Username
+    cmd_remote = 'nc localhost 30000 <<< $(cat /etc/bandit_pass/bandit14)'
+
+    # Establish SSH connection to remote server
+    client = SSHClient()
+    client.set_missing_host_key_policy(AutoAddPolicy())
+    client.connect(server, username=username_bandit, password=Key, port=port_bandit)
+
+    # Execute the remote SSH command to retrieve file from local machine
+    stdin, stdout, stderr = client.exec_command(cmd_remote)
+    Key = stdout.read().decode().strip()
+
+    # Extract the second line from the Key string
+    key_lines = Key.split('\n')
+    if len(key_lines) >= 2:
+        Key = key_lines[1]
+        print("Password for {} : {}\n".format(username_bandit, Key))
+
+    Key = Key.strip()
+    counter += 1
+    ################################################################ Level 15
+    username_bandit = "bandit{}".format(counter) # Username
+    cmd_remote = 'password=$(cat /etc/bandit_pass/bandit15); openssl s_client -quiet -connect localhost:30001 <<< "$password"'
+
+    # Establish SSH connection to remote server
+    client = SSHClient()
+    client.set_missing_host_key_policy(AutoAddPolicy())
+    client.connect(server, username=username_bandit, password=Key, port=port_bandit)
+
+    # Execute the remote SSH command to retrieve file from local machine
+    stdin, stdout, stderr = client.exec_command(cmd_remote)
+    Key = stdout.read().decode().strip()
+
+    # Extract the second line from the Key string
+    key_lines = Key.split('\n')
+    correct_index = key_lines.index('Correct!') if 'Correct!' in key_lines else -1
+
+    if correct_index != -1 and correct_index + 1 < len(key_lines):
+        Key = key_lines[correct_index + 1]
+        print("Password for {} : {}\n".format(username_bandit, Key))
+
+    Key = Key.strip()
+    counter += 1
+    ################################################################ Level 16
+    username_bandit = "bandit{}".format(counter) # Username
+    cmd_remote = """
+    port_number=$(nmap -p 31000-32000 -sV -T4 localhost | grep -Eo '^[0-9]+/tcp open\s+ssl/unknown' | grep -Eo '^[0-9]+');
+    password=$(cat /etc/bandit_pass/bandit16);
+    echo $password;
+    private_key=$(echo "$password" | openssl s_client -quiet -connect localhost:$port_number 2>/dev/null | awk '/Correct!/ {flag=1; next} flag {print}');
+    echo $private_key;
+    random_folder_name="/tmp/random_$(date +%s)";
+    mkdir "$random_folder_name";
+    private_key_file="$random_folder_name/private_key.pem";
+    echo "$private_key" > "$private_key_file" && chmod 700 "$private_key_file";
+    ssh -o "StrictHostKeyChecking=no" -i $private_key_file bandit17@bandit.labs.overthewire.org -p 2220 "cat /etc/bandit_pass/bandit17"
+    """
+
+    # Establish SSH connection to remote server
+    client = SSHClient()
+    client.set_missing_host_key_policy(AutoAddPolicy())
+    client.connect(server, username=username_bandit, password=Key, port=port_bandit)
+
+    # Execute the remote SSH command to retrieve file from local machine
+    stdin, stdout, stderr = client.exec_command(cmd_remote)
+    Key = stdout.read().decode().strip()
+    # Extract the second line from the Key string
+    Key = Key.split('\n')[-1].strip()
+
+    
+    print("Password for {} : {}\n".format(username_bandit, Key))
+
+    Key = Key.strip()
+    counter += 1
+    ################################################################ Level 17
+    username_bandit = "bandit{}".format(counter) # Username
+    cmd_remote = "diff passwords.old passwords.new | grep '>' | awk '{print $2}'"
+
+    # Establish SSH connection to remote server
+    client = SSHClient()
+    client.set_missing_host_key_policy(AutoAddPolicy())
+    client.connect(server, username=username_bandit, password=Key, port=port_bandit)
+
+    # Execute the remote SSH command to retrieve file from local machine
+    stdin, stdout, stderr = client.exec_command(cmd_remote)
+    Key = stdout.read().decode().strip()
+    
+    print("Password for {} : {}\n".format(username_bandit, Key))
+
+    Key = Key.strip()
+    counter += 1
+    ################################################################ Level 18
+    username_bandit = "bandit{}".format(counter) # Username
+    cmd_remote = "cat readme"
+
+    # Establish SSH connection to remote server
+    client = SSHClient()
+    client.set_missing_host_key_policy(AutoAddPolicy())
+    client.connect(server, username=username_bandit, password=Key, port=port_bandit)
+
+    # Execute the remote SSH command to retrieve file from local machine
+    stdin, stdout, stderr = client.exec_command(cmd_remote)
+    Key = stdout.read().decode().strip()
+    
+    print("Password for {} : {}\n".format(username_bandit, Key))
+
+    Key = Key.strip()
+    counter += 1
+    ################################################################ Level 19
+    username_bandit = "bandit{}".format(counter) # Username
+    cmd_remote = "./bandit20-do cat /etc/bandit_pass/bandit20"
+
+    # Establish SSH connection to remote server
+    client = SSHClient()
+    client.set_missing_host_key_policy(AutoAddPolicy())
+    client.connect(server, username=username_bandit, password=Key, port=port_bandit)
+
+    # Execute the remote SSH command to retrieve file from local machine
+    stdin, stdout, stderr = client.exec_command(cmd_remote)
+    Key = stdout.read().decode().strip()
+    
+    print("Password for {} : {}\n".format(username_bandit, Key))
+
+    Key = Key.strip()
+    counter += 1
+    ################################################################ Level 20
+    username_bandit = "bandit{}".format(counter) # Username
+    cmd_remote = """random_folder_name="/tmp/random_$(date +%s)";mkdir "$random_folder_name";script="$random_folder_name/script.sh"; echo -e 'echo -n "{}" | nc -l -p 1234 &\nsleep 2\n/home/bandit20/suconnect 1234' > $script && chmod 777 "$script"; bash $random_folder_name/script.sh""".format(Key)
+    # Establish SSH connection to remote server
+    client = SSHClient()
+    client.set_missing_host_key_policy(AutoAddPolicy())
+    client.connect(server, username=username_bandit, password=Key, port=port_bandit)
+
+    # Execute the remote SSH command to retrieve file from local machine
+    stdin, stdout, stderr = client.exec_command(cmd_remote)
+    Key = stdout.read().decode().strip()
+
+    non_useful_words = ["Read", "Password"]  # Add your non-useful words to this list
+
+    # Assuming 'Key' is a multiline string
+    lines = Key.split('\n')
+    filtered_lines = [line for line in lines if not any(word in line for word in non_useful_words)]
+    filtered_key = '\n'.join(filtered_lines)
+    Key = ""
+    Key = filtered_key
+
+    print("Password for {} : {}\n".format(username_bandit, Key))
+
+    Key = Key.strip()
+    counter += 1 
+
+    ################################################################ Level 21
+    username_bandit = "bandit{}".format(counter) # Username
+    cmd_remote = '''random_folder_name="/tmp/random_$(date +%s)"; folder_path="/tmp/$random_folder_name"; mkdir -p "$folder_path"; script="$folder_path/script.sh"; echo -e 'cron_dir="/etc/cron.d"; desired_cron_level=22; check_directory() { local dir="$1"; if [ ! -d "$dir" ]; then echo "Directory not found: $dir"; exit 1; fi }; extract_and_display_file_info() { local line="$1"; local file_location=$(echo "$line" | awk "{print \$7}"); if [ -f "$file_location" ]; then echo "    Command runs file: $file_location"; example_command=$(cat "$file_location"); get_file_paths "$example_command"; fi }; get_file_paths() { local command="$1"; file_paths=$(echo "$command" | awk "{for(i=1;i<=NF;i++) if(\$i ~ /^\//) print \$i}"); for file_path in $file_paths; do cat_file_if_readable "$file_path"; done }; cat_file_if_readable() { local file_path="$1"; if [ -r "$file_path" ]; then cat "$file_path"; fi }; process_cron_file() { local file="$1"; local level="$2"; local commands=$(grep -E "^[^#].*$level" "$file" 2>/dev/null); if [ -n "$commands" ]; then echo "$commands" | while IFS= read -r line; do echo "  Cron Job: $line"; extract_and_display_file_info "$line"; done; fi }; cron_files=$(ls "$cron_dir"); check_directory "$cron_dir"; for cron_file in $cron_files; do if [ -f "$cron_dir/$cron_file" ]; then process_cron_file "$cron_dir/$cron_file" "$desired_cron_level"; fi; done' >"$script" && chmod 777 "$script" && bash "$script"'''
+    # Establish SSH connection to remote server
+    client = SSHClient()
+    client.set_missing_host_key_policy(AutoAddPolicy())
+    client.connect(server, username=username_bandit, password=Key, port=port_bandit)
+
+    # Execute the remote SSH command to retrieve file from local machine
+    stdin, stdout, stderr = client.exec_command(cmd_remote)
+    Key = stdout.read().decode().strip()
+    Key = Key.split('\n')[-1].strip()
+    print("Password for {} : {}\n".format(username_bandit, Key))
+
+    Key = Key.strip()
+    counter += 1 
+
+##################### END 
+    print("")
+    print("END OF LOOP")
+    break 
