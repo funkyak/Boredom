@@ -10,7 +10,7 @@ The projects I have selected are only chosen because I thought wouldn't it be fu
 
 ## Usage
 
-Please clone and use the REAMME for each folder as the usage instructions will be accurate in the operation  
+Please clone and use the README for each folder as the usage instructions will be accurate in the operation  
 
 ## Contributing
 
